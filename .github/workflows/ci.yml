@@ -1,0 +1,58 @@
+name: Validate and package
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85.1
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked --all-targets
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          cache: true
+      - run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+      - run: ./scripts/generate-proto.sh
+      - run: git diff --exit-code -- frontend/lib/generated
+      - working-directory: frontend
+        run: |
+          flutter pub get
+          dart format --output=none --set-exit-if-changed lib/main.dart lib/services lib/widgets test
+          flutter analyze
+          flutter test
+          flutter build web --release --pwa-strategy=none --dart-define=API_URL=/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-web
+          path: frontend/build/web
+  containers:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+      - run: |
+          docker compose up -d
+          for i in $(seq 1 30); do
+            if curl --fail http://localhost:8088/healthz; then break; fi
+            sleep 2
+          done
+          python3 scripts/smoke.py
+      - if: always()
+        run: docker compose down

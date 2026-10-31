@@ -1,0 +1,19 @@
+name: aerocontrol
+description: Ground control station simulator dashboard.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  grpc: ^4.0.1
+  protobuf: ^3.1.0
+  fixnum: ^1.1.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+flutter:
+  uses-material-design: true

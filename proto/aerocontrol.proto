@@ -1,0 +1,37 @@
+syntax = "proto3";
+package aerocontrol.v1;
+
+service GroundControl {
+  rpc GetSnapshot(Empty) returns (Telemetry);
+  rpc WatchTelemetry(Empty) returns (stream Telemetry);
+  rpc ExecuteCommand(CommandRequest) returns (CommandReply);
+  rpc GetEvents(EventQuery) returns (EventLog);
+}
+message Empty {}
+enum FlightMode { DISARMED = 0; ARMED = 1; MISSION = 2; HOLD = 3; RETURNING = 4; LANDING = 5; }
+enum Command { ARM = 0; DISARM = 1; START_MISSION = 2; HOLD_POSITION = 3; RETURN_HOME = 4; LAND = 5; INJECT_GPS_FAULT = 6; INJECT_BATTERY_FAULT = 7; CLEAR_FAULTS = 8; RESET = 9; }
+enum Severity { INFO = 0; WARNING = 1; CRITICAL = 2; }
+message Telemetry {
+  uint64 sequence = 1;
+  int64 timestamp_ms = 2;
+  FlightMode mode = 3;
+  double latitude = 4;
+  double longitude = 5;
+  double altitude_m = 6;
+  double speed_mps = 7;
+  double heading_deg = 8;
+  double battery_pct = 9;
+  double voltage = 10;
+  uint32 satellites = 11;
+  double cpu_pct = 12;
+  double temperature_c = 13;
+  bool gps_healthy = 14;
+  bool battery_healthy = 15;
+  double mission_progress = 16;
+  repeated string alerts = 17;
+}
+message CommandRequest { Command command = 1; }
+message CommandReply { bool accepted = 1; string message = 2; Telemetry telemetry = 3; }
+message EventQuery { uint64 after_id = 1; }
+message Event { uint64 id = 1; int64 timestamp_ms = 2; Severity severity = 3; string message = 4; }
+message EventLog { repeated Event events = 1; }

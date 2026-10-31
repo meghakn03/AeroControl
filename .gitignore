@@ -1,0 +1,13 @@
+/target/
+.dart_tool/
+.packages
+build/
+.flutter-plugins*
+frontend/.metadata
+frontend/android/
+frontend/ios/
+frontend/linux/
+frontend/macos/
+frontend/windows/
+*.log
+.DS_Store

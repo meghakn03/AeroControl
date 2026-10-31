@@ -1,0 +1,5 @@
+.git
+**/build
+**/.dart_tool
+target
+*.log
