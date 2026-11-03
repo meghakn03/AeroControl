@@ -1,3 +1,5 @@
+**Tech stack:** Rust, Tokio, Flutter, Dart, gRPC, Protocol Buffers, Nginx, Docker Compose, GitHub Actions
+
 # AeroControl
 
 A ground control station **simulator** built with Rust, Tokio, Flutter, Dart, gRPC and Protocol Buffers. One shared virtual quadrotor broadcasts telemetry at 5 Hz; every connected operator sees the same vehicle state.
